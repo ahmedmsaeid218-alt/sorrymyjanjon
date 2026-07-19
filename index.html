@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سؤال مهم لجنجون</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- استدعاء مكتبة المفرقعات النارية (Confetti) -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffe6e6; 
+            font-family: 'Cairo', sans-serif; 
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 90%;
+            position: relative;
+            z-index: 10;
+        }
+        .emoji {
+            font-size: 100px;
+            margin: 0;
+            line-height: 1;
+        }
+        h1 {
+            color: #ff4d4d;
+            margin-top: 20px;
+            font-weight: 700;
+        }
+        .btn-group {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        button {
+            font-family: 'Cairo', sans-serif;
+            font-size: 18px;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        #forgiveBtn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        #forgiveBtn:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+        #madBtn {
+            background-color: #ff4d4d;
+            color: white;
+            position: relative;
+            z-index: 20;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <p class="emoji" id="emoji">🤔</p>
+        <h1 id="question">يا جنجون، لسه زعلانة مني؟</h1>
+        <div class="btn-group" id="btnGroup">
+            <button id="forgiveBtn">خلاص سامحتك ❤️</button>
+            <button id="madBtn">أيوة لسه زعلانة</button>
+        </div>
+    </div>
+
+    <script>
+        const question = document.getElementById("question");
+        const emoji = document.getElementById("emoji");
+        const forgiveBtn = document.getElementById("forgiveBtn");
+        const madBtn = document.getElementById("madBtn");
+        const btnGroup = document.getElementById("btnGroup");
+
+        let madClickCount = 0;
+
+        forgiveBtn.addEventListener("click", () => {
+            // تغيير النص والشكل
+            question.innerHTML = "كنت عارف إن قلبك أبيض يا جنجون! 🥰";
+            emoji.innerHTML = "❤️";
+            btnGroup.style.display = "none";
+
+            // 1. تشغيل الموسيقى
+            // تأكد إن فيه ملف اسمه music.mp3 في نفس الفولدر
+            const audio = new Audio('music.mp3');
+            audio.play();
+
+            // 2. تشغيل المفرقعات النارية (Fireworks)
+            const duration = 3 * 1000; // الاحتفال هيستمر 3 ثواني
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                const particleCount = 50 * (timeLeft / duration);
+                
+                // إطلاق المفرقعات من أماكن عشوائية في الشاشة
+                confetti(Object.assign({}, defaults, { 
+                    particleCount,
+                    origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+                }));
+                confetti(Object.assign({}, defaults, { 
+                    particleCount,
+                    origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+                }));
+            }, 250);
+        });
+
+        madBtn.addEventListener("click", (e) => {
+            if (madClickCount >= 3) {
+                e.preventDefault();
+                return;
+            }
+
+            madClickCount++;
+
+            if (madClickCount === 1) {
+                question.innerHTML = "متأكدة يا جنجون؟ عشان خاطري؟ 🥺";
+                emoji.innerHTML = "😢";
+                madBtn.innerHTML = "أيوة لسه زعلانة";
+            } else if (madClickCount === 2) {
+                question.innerHTML = "فكري تاني! فرصة أخيرة! 🙏";
+                emoji.innerHTML = "😭";
+                madBtn.innerHTML = "برضو زعلانة";
+            } else if (madClickCount === 3) {
+                question.innerHTML = "طيب، إنتي اللي اضطريتيني لكده يا جنجون 😎";
+                emoji.innerHTML = "😈";
+                madBtn.innerHTML = "مش مسامحاك!";
+                
+                madBtn.style.position = "absolute";
+            }
+        });
+
+        function escapeButton(e) {
+            if (madClickCount >= 3) {
+                if(e.type === 'touchstart') e.preventDefault(); 
+
+                const x = Math.random() * (window.innerWidth - madBtn.offsetWidth);
+                const y = Math.random() * (window.innerHeight - madBtn.offsetHeight);
+                
+                madBtn.style.left = `${x}px`;
+                madBtn.style.top = `${y}px`;
+            }
+        }
+
+        madBtn.addEventListener("mouseover", escapeButton);
+        madBtn.addEventListener("touchstart", escapeButton);
+    </script>
+</body>
+</html>
